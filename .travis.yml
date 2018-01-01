@@ -1,0 +1,14 @@
+language: python
+python:
+- '3.6'
+install:
+- pip install -r requirements.txt
+script:
+- pytest
+deploy:
+  provider: heroku
+  api_key:
+    secure: ESQlvfpteVV4ysMQ9I0yr09qZ1RRDTNHn/8IuAMaYed+EfMnDLxNX0it/L3a2uHpwdiwBAbccdkAAfGWrv5iPFEZhJ2mFCGtKbjfAn2Xj4l65ZI8MtIe8vDCmVldU1CRoQiabP+wx6pXbk0gidNfMVBRdi+cTjvZtzf5vrcdsGXgAe7wt9U9AOaOSlsbUYoI9MPHpLgARSwf6P4bhGnX7y8rJhZVdpunRALIb1tFwe8ylDhUoFAISyBYh8acnK9mVX8yxG8NusULuXssEzdDafnrby+bJDmL9Wi+GRlj47IVbpFaQq/yiDbBNiU5olVAL9Y5q7SDvVw4RA/CG8s5GYEmUr0MyVZ8zRbnLLYv3NKkH5jSjeG4aiSzzP5z2bIzkBF1qDE3z9L2EuLH7oNF2UOqldy7IaIi5lJ2FsfIdiLUpeR/Gy4bcMvjr0CvyFkVoVml/SEq11PugEcY4sxSHnV5PJpLVRN6BIFBkYPZcK3PYScTqJbsiemt3Sh57eSXYp0ljY9NqrdMCzIQRDW75TcCS88IKgR9PHRAYhUzXB0mdvAqcG8oYLsBpxC0+ZEa41Lx5UBBM5hkJQMVuYJXlHuWWDB834oWgijRUoir7wagZUZ1+XuElYNTJs+jc7rNoG6+p3tQPXcEGsvsp6gKKEmlZEYdk7xBaGnC5MiBtY4=
+  app: winwintrade
+  on:
+repo: yerlandinata/Win-Win-Trade
