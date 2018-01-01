@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/yerlandinata/Win-Win-Trade.svg?branch=master)](https://travis-ci.org/yerlandinata/Win-Win-Trade)
+
 # Win Win Trade
 Cryptocurrency trading bot
 
