@@ -14,3 +14,4 @@ To add more exchange, see the design
 - Initial investment: initial_investment
 - Bitcoin Indonesia VIP API Key: vip_api_key
 - Bitcoin Indonesia VIP API Secret: vip_api_secret
+- Bitcoin Indonesia Active Trading Currency Symbol (comma-separated): vip_trades_symbol [example: btcidr,xlmidr,ethbtc]

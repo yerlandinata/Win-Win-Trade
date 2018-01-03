@@ -1,16 +1,19 @@
-from datetime import datetime
-import requests
-
 class Market:
 
     def __init__(self, base_url, ohlc_endpoint=None, buy_orderbook_endpoint=None, sell_orderbook_endpoint=None):
+        self.base_url = base_url
+        self.ohlc_url = (self.base_url + ohlc_endpoint) if ohlc_endpoint else None
+        self.buy_orderbook_url = (self.base_url + buy_orderbook_endpoint) if buy_orderbook_endpoint else None
+        self.sell_orderbook_url = (self.base_url + sell_orderbook_endpoint) if sell_orderbook_endpoint else None
+
+    def get_ohlc(self, currency, after, before=None, period='1'):
         pass
 
-    def get_ohlc(after, before=None):
+    def get_buy_order_book(self):
         pass
 
-    def get_buy_order_book():
+    def get_sell_order_book(self):
         pass
 
-    def get_sell_order_book():
+    def parse_ohlc_data(self, json_text):
         pass
