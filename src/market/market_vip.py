@@ -17,6 +17,8 @@ class BitcoinIndonesiaMarket(Market):
         )
 
     def get_ohlc(self, currency, after, before=None, period=1):
+        if before is None:
+            before = int(datetime.now().timestamp())
         query = {'symbol': currency, 'from': str(after), 'to': str(before), 'resolution': str(period)}
         response = requests.get(self.ohlc_url, params=query)
         return self.parse_ohlc_data(response.content)

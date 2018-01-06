@@ -1,3 +1,4 @@
+from datetime import datetime
 import requests
 import pytest
 from pytest_mock import mocker
@@ -16,10 +17,18 @@ def req_mock(mocker, monkeypatch):
 
 def test_get_ohlc_with_before_url(market, req_mock):
     symbol = 'BTCIDR'
-    before = 1
-    after = 2
+    before = 2
+    after = 1
     expected_query = {'symbol': symbol, 'from': str(after), 'to': str(before), 'resolution':'1'}
     market.get_ohlc(symbol, after, before=before)
+    req_mock.assert_called_once_with('https://vip.bitcoin.co.id/tradingview/history', params=expected_query)
+
+def test_get_ohlc_without_before_url(market, req_mock):
+    symbol = 'BTCIDR'
+    before = int(datetime.now().timestamp())
+    after = 1
+    expected_query = {'symbol': symbol, 'from': str(after), 'to': str(before), 'resolution':'1'}
+    market.get_ohlc(symbol, after)
     req_mock.assert_called_once_with('https://vip.bitcoin.co.id/tradingview/history', params=expected_query)
 
 def test_parse_ohlc_data(market):
