@@ -1,6 +1,6 @@
 class ExchangeAccount:
 
-    def get_balance(self):
+    def get_balance(self, currency):
         pass
 
     def get_order(self, currency, order_id=None):

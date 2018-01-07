@@ -16,19 +16,19 @@ class VipExchangeAccount(ExchangeAccount):
         self.__secret = bytes(secret, 'utf-8')
 
     def calculate_signature(self, payload):
-        q = urlencode(payload)
-        m = bytes(q, 'utf-8')
-        return hmac.new(self.__secret, msg=m, digestmod=hashlib.sha512).hexdigest()
+        query = urlencode(payload)
+        message = bytes(query, 'utf-8')
+        return hmac.new(self.__secret, msg=message, digestmod=hashlib.sha512).hexdigest()
 
     def post_request(self, payload):
-        h = {
+        header = {
             'Key': self.__api_key,
             'Sign': self.calculate_signature(payload)
         }
-        res = requests.post(self.BASE_URL, data=payload, headers=h)
+        res = requests.post(self.BASE_URL, data=payload, headers=header)
         return json.loads(res.content) 
 
-    def get_balance(self):
+    def get_balance(self, currency):
         pass
 
     def get_order(self, currency, order_id=None):
