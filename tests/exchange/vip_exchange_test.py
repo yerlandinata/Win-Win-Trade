@@ -38,3 +38,17 @@ def test_post_request(exchange, req_mock):
     ])
     assert exchange.post_request(payload) == {'success': 1}
     req_mock.assert_called_once_with(VipExchangeAccount.BASE_URL, data=payload, headers=expected_headers)
+
+def test_get_balance(exchange, req_mock):
+    currencies = ['idr', 'btc', 'ltc', 'doge']
+    expects = [10000, 3.14, 33.14, 1600.299]
+    req_mock.return_value.content = '{"success":1,"return":{"balance":{"idr":10000,"btc":3.14,"ltc":33.14,"doge":1600.299},"server_time":1392225342}}'
+    for currency, expect in zip(currencies, expects):
+        assert exchange.get_balance(currency) == expect
+        args, kwargs = req_mock.call_args
+        assert args[0] == VipExchangeAccount.BASE_URL
+        assert kwargs['data'] == OrderedDict([
+            ('nonce', str(int(datetime.now().timestamp()))),
+            ('method', 'getInfo')
+        ])
+    assert req_mock.call_count == len(currencies)

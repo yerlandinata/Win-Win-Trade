@@ -29,7 +29,12 @@ class VipExchangeAccount(ExchangeAccount):
         return json.loads(res.content) 
 
     def get_balance(self, currency):
-        pass
+        payload = OrderedDict([
+            ('nonce', str(int(datetime.now().timestamp()))),
+            ('method', 'getInfo')
+        ])
+        res = self.post_request(payload)
+        return res['return']['balance'][currency]
 
     def get_order(self, currency, order_id=None):
         pass
