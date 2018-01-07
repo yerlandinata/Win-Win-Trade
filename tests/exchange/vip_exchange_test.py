@@ -13,7 +13,7 @@ def exchange():
 def req_mock(mocker, monkeypatch):
     mockery = mocker.Mock(return_value=mocker.Mock())
     mockery.return_value.content = '{"success": 1}'
-    monkeypatch.setattr(requests, 'get', mockery)
+    monkeypatch.setattr(requests, 'post', mockery)
     return mockery
 
 def test_calculate_signature(exchange):
@@ -26,3 +26,15 @@ def test_calculate_signature(exchange):
     ])
     expected_signature = '450b244834e0896d1f5d5429511e18d660b4f600f18513dade9196779e54f49ac990a7b86ec9027035c7f69bc88df188e33baf255adf38f428a697f8a496042e'
     assert exchange.calculate_signature(payload) == expected_signature
+
+def test_post_request(exchange, req_mock):
+    expected_headers = {
+        'Key': 'a',
+        'Sign': '450b244834e0896d1f5d5429511e18d660b4f600f18513dade9196779e54f49ac990a7b86ec9027035c7f69bc88df188e33baf255adf38f428a697f8a496042e'
+    }
+    payload = OrderedDict([
+        ('nonce', '1515258126'),
+        ('method', 'getInfo')
+    ])
+    assert exchange.post_request(payload) == {'success': 1}
+    req_mock.assert_called_once_with(VipExchangeAccount.BASE_URL, data=payload, headers=expected_headers)

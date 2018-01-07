@@ -1,6 +1,7 @@
 from datetime import datetime
 import hmac
 import hashlib
+import json
 from collections import OrderedDict
 from urllib.parse import urlencode
 import requests
@@ -19,8 +20,13 @@ class VipExchangeAccount(ExchangeAccount):
         m = bytes(q, 'utf-8')
         return hmac.new(self.__secret, msg=m, digestmod=hashlib.sha512).hexdigest()
 
-    def post_request(self, payload, signature):
-        pass
+    def post_request(self, payload):
+        h = {
+            'Key': self.__api_key,
+            'Sign': self.calculate_signature(payload)
+        }
+        res = requests.post(self.BASE_URL, data=payload, headers=h)
+        return json.loads(res.content) 
 
     def get_balance(self):
         pass
