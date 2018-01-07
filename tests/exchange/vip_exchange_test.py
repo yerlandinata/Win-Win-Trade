@@ -52,3 +52,9 @@ def test_get_balance(exchange, req_mock):
             ('method', 'getInfo')
         ])
     assert req_mock.call_count == len(currencies)
+
+def test_get_order_with_id(exchange, req_mock):
+    pair = 'btcidr'
+    order_id = '1'
+    req_mock.return_value.content = '{"success": 1,"return": {"order": {"order_id": "94425","price": "0.00810000","type": "sell","order_ltc": "1.00000000","remain_ltc": "0.53000000","submit_time": "1497657065","finish_time": "0","status": "open"}}}'
+    

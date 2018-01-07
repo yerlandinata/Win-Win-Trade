@@ -36,14 +36,14 @@ class VipExchangeAccount(ExchangeAccount):
         res = self.post_request(payload)
         return res['return']['balance'][currency]
 
-    def get_order(self, currency, order_id=None):
+    def get_order(self, **kwargs):
         pass
 
-    def is_order_fulfilled(self, currency, order_id):
+    def cancel_order(self, **kwargs):
         pass
 
-    def place_buy_order(self, currency_pair, amount):
+    def place_buy_order(self, **kwargs):
         pass
 
-    def place_sell_order(self, currency_pair, amount):
+    def place_sell_order(self, **kwargs):
         pass
