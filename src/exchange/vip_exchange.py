@@ -5,7 +5,7 @@ import json
 from collections import OrderedDict
 from urllib.parse import urlencode
 import requests
-from .base import ExchangeAccount
+from .exchange import ExchangeAccount
 
 class VipExchangeAccount(ExchangeAccount):
 
@@ -37,6 +37,10 @@ class VipExchangeAccount(ExchangeAccount):
         return res['return']['balance'][currency]
 
     def get_order(self, **kwargs):
+        '''
+        Arguments:
+        order_id, currency_pair
+        '''
         pass
 
     def cancel_order(self, **kwargs):

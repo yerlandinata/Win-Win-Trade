@@ -7,13 +7,16 @@ class Market:
         self.sell_orderbook_url = (self.base_url + sell_orderbook_endpoint) if sell_orderbook_endpoint else None
 
     def get_ohlc(self, currency, after, before=None, period='1'):
-        pass
+        raise NotImplementedError()
 
     def get_buy_order_book(self):
-        pass
+        raise NotImplementedError()
 
     def get_sell_order_book(self):
-        pass
+        raise NotImplementedError()
 
     def parse_ohlc_data(self, json_text):
-        pass
+        raise NotImplementedError()
+
+class MarketDownError(RuntimeError):
+    pass

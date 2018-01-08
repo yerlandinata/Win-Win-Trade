@@ -1,0 +1,17 @@
+from .order import Order
+
+class VipOrder(Order):
+
+    def __init__(self, exchange, order_id, currency_pair, order_type ,submit_time, remaining_amount, finish_time=None):
+        super().__init__(exchange, order_id, currency_pair, order_type ,submit_time, remaining_amount, finish_time=finish_time)
+        self.immediate_count = 0
+
+    def cancel(self):
+        self.exchange.cancel_order(order_id=self.order_id, currency_pair=self.currency_pair, order_type=self.order_type)
+        self.is_canceled = True
+
+    def refresh(self):
+        updated = self.exchange.get_order(order_id=self.order_id, currency_pair=self.currency_pair)
+        self.finish_time = updated.finish_time
+        self.remaining_amount = updated.remaining_amount
+        
