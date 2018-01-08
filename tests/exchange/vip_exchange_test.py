@@ -3,6 +3,7 @@ from collections import OrderedDict
 import requests
 import pytest
 from pytest_mock import mocker
+from src.exchange.exchange import ExchangeOperationFailedError
 from src.exchange.vip_exchange import VipExchangeAccount
 from src.trader.vip_order import VipOrder
 
@@ -60,8 +61,6 @@ def test_get_order_with_id(exchange, req_mock):
     req_mock.return_value.content = '{"success": 1,"return": {"order": {"order_id": "94425","price": "0.00810000","type": "sell","order_ltc": "1.00000000","remain_ltc": "0.53000000","submit_time": "1497657065","finish_time": "0","status": "open"}}}'
     expected = VipOrder(exchange, order_id, 'ltc_idr', 'sell', 0.0081, 1497657065, 0.53)
     actual_test = exchange.get_order(order_id=order_id, currency_pair=pair)
-    print('expect:', expected)
-    print('actual:', actual_test)
     assert actual_test == expected
     args, kwargs = req_mock.call_args
     assert args[0] == VipExchangeAccount.BASE_URL
@@ -71,3 +70,11 @@ def test_get_order_with_id(exchange, req_mock):
         ('pair', pair),
         ('order_id', order_id)
     ])
+
+def test_get_order_with_id_fail(exchange, req_mock):
+    pair = 'ltc_idr'
+    order_id = '94425'
+    req_mock.return_value.content = '{"success": 0, "error": "some error"}'
+    with pytest.raises(ExchangeOperationFailedError) as excinfo:
+        exchange.get_order(order_id=order_id, currency_pair=pair)
+    assert str(excinfo.value) == 'some error'

@@ -5,7 +5,7 @@ import json
 from collections import OrderedDict
 from urllib.parse import urlencode
 import requests
-from .exchange import ExchangeAccount
+from .exchange import ExchangeAccount, ExchangeOperationFailedError
 from src.trader.vip_order import VipOrder
 
 class VipExchangeAccount(ExchangeAccount):
@@ -49,6 +49,10 @@ class VipExchangeAccount(ExchangeAccount):
             ('order_id', kwargs['order_id'])
         ])
         res = self.post_request(payload)
+        if res['success'] != 1:
+            if 'error' in res.keys(): 
+                raise ExchangeOperationFailedError(res['error'])
+            else: raise ExchangeOperationFailedError('Unknown error')
         remain_key = ''
         for key in res['return']['order'].keys():
             if 'remain' in key:

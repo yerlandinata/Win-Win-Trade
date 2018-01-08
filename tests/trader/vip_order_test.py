@@ -29,4 +29,3 @@ def test_cancel_failed(exchange):
     with pytest.raises(ExchangeOperationFailedError) as excinfo:
         order.cancel()
     assert fail_message == str(excinfo.value)
-
