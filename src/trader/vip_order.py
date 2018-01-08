@@ -2,8 +2,8 @@ from .order import Order
 
 class VipOrder(Order):
 
-    def __init__(self, exchange, order_id, currency_pair, order_type ,submit_time, remaining_amount, finish_time=None):
-        super().__init__(exchange, order_id, currency_pair, order_type ,submit_time, remaining_amount, finish_time=finish_time)
+    def __init__(self, exchange, order_id, currency_pair, order_type, price, submit_time, remaining_amount, finish_time=None):
+        super().__init__(exchange, order_id, currency_pair, order_type, price, submit_time, remaining_amount, finish_time=finish_time)
         self.immediate_count = 0
 
     def cancel(self):
