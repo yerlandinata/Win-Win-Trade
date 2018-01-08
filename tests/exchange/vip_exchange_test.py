@@ -4,6 +4,7 @@ import requests
 import pytest
 from pytest_mock import mocker
 from src.exchange.vip_exchange import VipExchangeAccount
+from src.trader.vip_order import VipOrder
 
 @pytest.fixture()
 def exchange():
@@ -54,7 +55,19 @@ def test_get_balance(exchange, req_mock):
     assert req_mock.call_count == len(currencies)
 
 def test_get_order_with_id(exchange, req_mock):
-    pair = 'btc_idr'
+    pair = 'ltc_idr'
     order_id = '94425'
     req_mock.return_value.content = '{"success": 1,"return": {"order": {"order_id": "94425","price": "0.00810000","type": "sell","order_ltc": "1.00000000","remain_ltc": "0.53000000","submit_time": "1497657065","finish_time": "0","status": "open"}}}'
-    
+    expected = VipOrder(exchange, order_id, 'ltc_idr', 'sell', 0.0081, 1497657065, 0.53)
+    actual_test = exchange.get_order(order_id=order_id, currency_pair=pair)
+    print('expect:', expected)
+    print('actual:', actual_test)
+    assert actual_test == expected
+    args, kwargs = req_mock.call_args
+    assert args[0] == VipExchangeAccount.BASE_URL
+    assert kwargs['data'] == OrderedDict([
+        ('nonce', str(int(datetime.now().timestamp()))),
+        ('method', 'getOrder'),
+        ('pair', pair),
+        ('order_id', order_id)
+    ])

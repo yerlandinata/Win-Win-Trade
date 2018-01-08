@@ -11,6 +11,18 @@ class Order:
         self.finish_time = finish_time
         self.is_canceled = False
     
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __str__(self):
+        return '<Order: {}>'.format(self.__dict__)
+
+    def __hash__(self):
+        return hash(self.__dict__)
+
     def is_fulfilled(self):
         self.refresh()
         return self.remaining_amount == 0

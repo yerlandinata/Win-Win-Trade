@@ -6,6 +6,7 @@ from collections import OrderedDict
 from urllib.parse import urlencode
 import requests
 from .exchange import ExchangeAccount
+from src.trader.vip_order import VipOrder
 
 class VipExchangeAccount(ExchangeAccount):
 
@@ -41,7 +42,21 @@ class VipExchangeAccount(ExchangeAccount):
         Arguments:
         order_id, currency_pair
         '''
-        pass
+        payload = OrderedDict([
+            ('nonce', str(int(datetime.now().timestamp()))),
+            ('method', 'getOrder'),
+            ('pair', kwargs['currency_pair']),
+            ('order_id', kwargs['order_id'])
+        ])
+        res = self.post_request(payload)
+        remain_key = ''
+        for key in res['return']['order'].keys():
+            if 'remain' in key:
+                remain_key = key
+                break
+        return VipOrder(self, kwargs['order_id'], kwargs['currency_pair'], res['return']['order']['type'], 
+                        float(res['return']['order']['price']), int(res['return']['order']['submit_time']), 
+                        float(res['return']['order'][remain_key]), finish_time=int(res['return']['order']['finish_time']) if int(res['return']['order']['finish_time']) else None)
 
     def cancel_order(self, **kwargs):
         pass
