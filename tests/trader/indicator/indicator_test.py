@@ -1,5 +1,5 @@
 from pandas import DataFrame
-from src.trader.indicator.indicator import Indicator
+from src.trader.indicator import Indicator
 
 def test_update():
     df = DataFrame(data={

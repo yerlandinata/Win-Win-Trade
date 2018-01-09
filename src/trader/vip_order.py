@@ -1,4 +1,4 @@
-from .order import Order
+from . import Order
 
 class VipOrder(Order):
 

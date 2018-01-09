@@ -2,7 +2,7 @@ from datetime import datetime
 import requests
 import pytest
 from pytest_mock import mocker
-from src.market.market_vip import BitcoinIndonesiaMarket
+from src.market import BitcoinIndonesiaMarket
 
 @pytest.fixture()
 def market():

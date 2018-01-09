@@ -1,5 +1,5 @@
 import pytest
-from src.trader.vip_order import VipOrder
+from src.trader import VipOrder
 from src.exchange.exchange import ExchangeOperationFailedError
 
 @pytest.fixture()

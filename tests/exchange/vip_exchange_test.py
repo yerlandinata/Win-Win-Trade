@@ -4,9 +4,8 @@ from itertools import tee
 import requests
 import pytest
 from unittest.mock import call
-from src.exchange.exchange import ExchangeOperationFailedError
-from src.exchange.vip_exchange import VipExchangeAccount
-from src.trader.vip_order import VipOrder
+from src.exchange import ExchangeOperationFailedError, VipExchangeAccount
+from src.trader import VipOrder
 
 @pytest.fixture()
 def exchange():

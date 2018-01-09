@@ -5,8 +5,8 @@ import json
 from collections import OrderedDict
 from urllib.parse import urlencode
 import requests
-from src.trader.vip_order import VipOrder
-from .exchange import ExchangeAccount, ExchangeOperationFailedError
+from src.trader import VipOrder
+from . import ExchangeAccount, ExchangeOperationFailedError
 
 class VipExchangeAccount(ExchangeAccount):
 

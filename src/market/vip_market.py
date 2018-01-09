@@ -2,7 +2,7 @@ from datetime import datetime
 import requests
 import pandas as pd
 import json
-from .market import Market
+from . import Market
 
 class BitcoinIndonesiaMarket(Market):
 
