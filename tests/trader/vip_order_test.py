@@ -1,5 +1,4 @@
 import pytest
-from pytest_mock import mocker
 from src.trader.vip_order import VipOrder
 from src.exchange.exchange import ExchangeOperationFailedError
 

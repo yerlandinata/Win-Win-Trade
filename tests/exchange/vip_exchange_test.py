@@ -1,8 +1,9 @@
 from datetime import datetime
 from collections import OrderedDict
+from itertools import tee
 import requests
 import pytest
-from pytest_mock import mocker
+from unittest.mock import call
 from src.exchange.exchange import ExchangeOperationFailedError
 from src.exchange.vip_exchange import VipExchangeAccount
 from src.trader.vip_order import VipOrder
@@ -17,6 +18,14 @@ def req_mock(mocker, monkeypatch):
     mockery.return_value.content = '{"success": 1}'
     monkeypatch.setattr(requests, 'post', mockery)
     return mockery
+
+@pytest.fixture()
+def req_mock_place_order(mocker, monkeypatch):
+    m1 = mocker.Mock()
+    m2 = mocker.Mock()
+    mockery = mocker.Mock(side_effect=[m1, m2])
+    monkeypatch.setattr(requests, 'post', mockery)
+    return (mockery, m1, m2)
 
 def test_calculate_signature(exchange):
     '''
@@ -78,3 +87,51 @@ def test_get_order_with_id_fail(exchange, req_mock):
     with pytest.raises(ExchangeOperationFailedError) as excinfo:
         exchange.get_order(order_id=order_id, currency_pair=pair)
     assert str(excinfo.value) == 'some error'
+
+def test_place_buy_order(exchange, req_mock_place_order):
+    pair = 'btc_idr'
+    order_id = '11560'
+    price = 10000
+    amount = 1.2
+    submit_time = str(int(datetime.now().timestamp()))
+    req, trade, order = req_mock_place_order
+    trade.content = '{"success":1,"return":{"receive_btc":0,"remain_rp":1000000,"order_id":11560,"balance":{"idr":"8000000"}}}'
+    order.content = '{"success": 1,"return": {"order": {"order_id": "11560","price": "10000","type": "buy","order_idr": "1.2","remain_idr": "1.2", "submit_time": "'+ submit_time +'","finish_time": "0","status": "open"}}}'
+    expected = VipOrder(exchange, order_id, pair, 'buy', price, int(submit_time), amount)
+    actual_test = exchange.place_buy_order(currency_pair=pair, price=price, amount=amount)
+    assert actual_test == expected
+    arg = VipExchangeAccount.BASE_URL
+    data = OrderedDict([
+        ('nonce', str(int(datetime.now().timestamp()))),
+        ('method', 'trade'),
+        ('pair', pair),
+        ('type', 'buy'),
+        ('price', str(price)),
+        ('btc', str(amount))
+    ])
+    assert req.call_args_list[0][0][0] == arg
+    assert req.call_args_list[0][1]['data'] == data
+
+def test_place_sell_order(exchange, req_mock_place_order):
+    pair = 'btc_idr'
+    order_id = '11560'
+    price = 10000
+    amount = 1.2
+    submit_time = str(int(datetime.now().timestamp()))
+    req, trade, order = req_mock_place_order
+    trade.content = '{"success":1,"return":{"receive_btc":0,"remain_rp":1000000,"order_id":11560,"balance":{"idr":"8000000"}}}'
+    order.content = '{"success": 1,"return": {"order": {"order_id": "11560","price": "10000","type": "sell","order_btc": "1.2","remain_btc": "1.2", "submit_time": "'+ submit_time +'","finish_time": "0","status": "open"}}}'
+    expected = VipOrder(exchange, order_id, pair, 'sell', price, int(submit_time), amount)
+    actual_test = exchange.place_sell_order(currency_pair=pair, price=price, amount=amount)
+    assert actual_test == expected
+    arg = VipExchangeAccount.BASE_URL
+    data = OrderedDict([
+        ('nonce', str(int(datetime.now().timestamp()))),
+        ('method', 'trade'),
+        ('pair', pair),
+        ('type', 'sell'),
+        ('price', str(price)),
+        ('idr', str(amount))
+    ])
+    assert req.call_args_list[0][0][0] == arg
+    assert req.call_args_list[0][1]['data'] == data
