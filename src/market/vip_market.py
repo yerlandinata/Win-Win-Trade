@@ -2,9 +2,20 @@ from datetime import datetime
 import requests
 import pandas as pd
 import json
+from src.valid_pairs import *
 from . import Market
 
 class BitcoinIndonesiaMarket(Market):
+
+    PAIRS = {
+        BTCIDR: 'BTCIDR',
+        ETHIDR: 'ETHIDR',
+        BCHIDR: 'BCHIDR',
+        BTGIDR: 'BTGIDR',
+        XLMIDR: 'XLMIDR',
+        XRPIDR: 'XRPIDR',
+        NXTIDR: 'NXTIDR'
+    }
 
     def __init__(self):
         super().__init__('https://vip.bitcoin.co.id', ohlc_endpoint='/tradingview/history')
@@ -17,8 +28,10 @@ class BitcoinIndonesiaMarket(Market):
         )
 
     def get_ohlc(self, currency, after, before=None, period=1):
+        if currency not in BitcoinIndonesiaMarket.PAIRS:
+            raise RuntimeError('Invalid currency pair: ' + currency)
         if before is None:
             before = int(datetime.now().timestamp())
-        query = {'symbol': currency, 'from': str(after), 'to': str(before), 'resolution': str(period)}
+        query = {'symbol': BitcoinIndonesiaMarket.PAIRS[currency], 'from': str(after), 'to': str(before), 'resolution': str(period)}
         response = requests.get(self.ohlc_url, params=query)
         return self.parse_ohlc_data(response.content)

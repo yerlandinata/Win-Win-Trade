@@ -1,0 +1,7 @@
+BTCIDR = 'btcidr'
+ETHIDR = 'ethidr'
+BCHIDR = 'bchidr'
+BTGIDR = 'btgidr'
+NXTIDR = 'nxtidr'
+XRPIDR = 'xrpidr'
+XLMIDR = 'xlmidr'

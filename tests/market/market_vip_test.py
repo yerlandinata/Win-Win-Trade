@@ -2,6 +2,7 @@ from datetime import datetime
 import requests
 import pytest
 from pytest_mock import mocker
+from src.valid_pairs import *
 from src.market import BitcoinIndonesiaMarket
 
 @pytest.fixture()
@@ -16,20 +17,27 @@ def req_mock(mocker, monkeypatch):
     return mockery
 
 def test_get_ohlc_with_before_url(market, req_mock):
-    symbol = 'BTCIDR'
+    symbol = BTCIDR
     before = 2
     after = 1
-    expected_query = {'symbol': symbol, 'from': str(after), 'to': str(before), 'resolution':'1'}
+    expected_query = {'symbol': BitcoinIndonesiaMarket.PAIRS[symbol], 'from': str(after), 'to': str(before), 'resolution':'1'}
     market.get_ohlc(symbol, after, before=before)
     req_mock.assert_called_once_with('https://vip.bitcoin.co.id/tradingview/history', params=expected_query)
 
 def test_get_ohlc_without_before_url(market, req_mock):
-    symbol = 'BTCIDR'
+    symbol = BTCIDR
     before = int(datetime.now().timestamp())
     after = 1
-    expected_query = {'symbol': symbol, 'from': str(after), 'to': str(before), 'resolution':'1'}
+    expected_query = {'symbol': BitcoinIndonesiaMarket.PAIRS[symbol], 'from': str(after), 'to': str(before), 'resolution':'1'}
     market.get_ohlc(symbol, after)
     req_mock.assert_called_once_with('https://vip.bitcoin.co.id/tradingview/history', params=expected_query)
+
+def test_get_ohlc_invalid_currency(market, req_mock):
+    symbol = 'USDIDR'
+    after = 1
+    with pytest.raises(RuntimeError) as excinfo:
+        market.get_ohlc(symbol, 1)
+    assert 'Invalid currency pair: ' + symbol in str(excinfo.value)
 
 def test_parse_ohlc_data(market):
     json_str = '{\
