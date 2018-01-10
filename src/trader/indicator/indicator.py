@@ -9,7 +9,7 @@ class Indicator:
         int                     float       float       float       float       float
         '''
         self.data = init_data
-        self.interval = len(self.data)
+        self.size = len(self.data)
 
     def update(self, timestamp, _open, high, low, close, volume):
         tail_df = DataFrame(data={
@@ -20,10 +20,10 @@ class Indicator:
             'volume': [volume]
         }, index=[timestamp])
         self.data = self.data.append(tail_df)
-        self.data = self.data.tail(self.interval)
+        self.data = self.data.tail(self.size)
 
-    def is_buy_signal(self):
+    def is_buy_signal(self, *args, **kwargs):
         raise NotImplementedError()
 
-    def is_sell_signal(self):
+    def is_sell_signal(self, *args, **kwargs):
         raise NotImplementedError()
