@@ -68,7 +68,7 @@ def test_get_order_with_id(exchange, req_mock):
     pair = XLMIDR
     order_id = '94425'
     req_mock.return_value.content = '{"success": 1,"return": {"order": {"order_id": "94425","price": "0.00810000","type": "sell","order_xlm": "1.00000000","remain_xlm": "0.53000000","submit_time": "1497657065","finish_time": "0","status": "open"}}}'
-    expected = VipOrder(exchange, order_id, 'xlm_idr', 'sell', 0.0081, 1497657065, 0.53)
+    expected = VipOrder(exchange, order_id, pair, 'sell', 0.0081, 1497657065, 0.53)
     actual_test = exchange.get_order(order_id=order_id, currency_pair=pair)
     assert actual_test == expected
     args, kwargs = req_mock.call_args
@@ -76,7 +76,7 @@ def test_get_order_with_id(exchange, req_mock):
     assert kwargs['data'] == OrderedDict([
         ('nonce', str(int(datetime.now().timestamp()))),
         ('method', 'getOrder'),
-        ('pair', VipExchangeAccount.PAIRS[XLMIDR]),
+        ('pair', VipExchangeAccount.PAIRS[pair]),
         ('order_id', order_id)
     ])
 
@@ -105,7 +105,7 @@ def test_place_buy_order(exchange, req_mock_place_order):
     req, trade, order = req_mock_place_order
     trade.content = '{"success":1,"return":{"receive_btc":0,"remain_rp":1000000,"order_id":11560,"balance":{"idr":"8000000"}}}'
     order.content = '{"success": 1,"return": {"order": {"order_id": "11560","price": "10000","type": "buy","order_idr": "1.2","remain_idr": "1.2", "submit_time": "'+ submit_time +'","finish_time": "0","status": "open"}}}'
-    expected = VipOrder(exchange, order_id, VipExchangeAccount.PAIRS[pair], 'buy', price, int(submit_time), amount)
+    expected = VipOrder(exchange, order_id, pair, 'buy', price, int(submit_time), amount)
     actual_test = exchange.place_buy_order(currency_pair=pair, price=price, amount=amount)
     assert actual_test == expected
     arg = VipExchangeAccount.BASE_URL
@@ -139,7 +139,7 @@ def test_place_sell_order(exchange, req_mock_place_order):
     req, trade, order = req_mock_place_order
     trade.content = '{"success":1,"return":{"receive_btc":0,"remain_rp":1000000,"order_id":11560,"balance":{"idr":"8000000"}}}'
     order.content = '{"success": 1,"return": {"order": {"order_id": "11560","price": "10000","type": "sell","order_btc": "1.2","remain_btc": "1.2", "submit_time": "'+ submit_time +'","finish_time": "0","status": "open"}}}'
-    expected = VipOrder(exchange, order_id, VipExchangeAccount.PAIRS[pair], 'sell', price, int(submit_time), amount)
+    expected = VipOrder(exchange, order_id, pair, 'sell', price, int(submit_time), amount)
     actual_test = exchange.place_sell_order(currency_pair=pair, price=price, amount=amount)
     assert actual_test == expected
     arg = VipExchangeAccount.BASE_URL

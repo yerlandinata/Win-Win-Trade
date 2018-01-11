@@ -21,6 +21,7 @@ class VipExchangeAccount(ExchangeAccount):
         XRPIDR: 'xrp_idr',
         NXTIDR: 'nxt_idr'
     }
+    INV_PAIRS = {v: k for k, v in PAIRS.items()}
 
     def __init__(self, api_key, secret):
         self.__api_key = api_key
@@ -57,7 +58,7 @@ class VipExchangeAccount(ExchangeAccount):
             if 'remain' in key:
                 remain_key = key
                 break
-        return VipOrder(self, str(kwargs['order_id']), VipExchangeAccount.PAIRS[kwargs['currency_pair']], res['return']['order']['type'],
+        return VipOrder(self, str(kwargs['order_id']), kwargs['currency_pair'], res['return']['order']['type'],
                         float(res['return']['order']['price']), int(res['return']['order']['submit_time']),
                         float(res['return']['order'][remain_key]), finish_time=int(res['return']['order']['finish_time']) if int(res['return']['order']['finish_time']) else None)
 
