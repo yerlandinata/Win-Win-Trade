@@ -163,3 +163,25 @@ def test_place_sell_order_invalid_currency(exchange, req_mock_place_order):
     with pytest.raises(RuntimeError) as excinfo:
         exchange.place_sell_order(currency_pair=pair, price=price, amount=amount)
     assert 'Invalid currency pair: ' + pair in str(excinfo.value)
+
+def test_get_order_fee(exchange, req_mock):
+    order = VipOrder(exchange, '18068655', BTCIDR, 'buy', 247452000, 1515173150, 0.00312888, finish_time=1515173250)
+    req_mock.return_value.content = '{"success": 1, "return": {"trades": [{"trade_id": "6893367", "order_id": "18608118", "type": "sell", "btc": "0.00022820", "price": "219102000", "fee": "149", "trade_time": "1515662991"}, {"trade_id": "6893326", "order_id": "18608057", "type": "buy", "btc": "0.00022820", "price": "219103000", "fee": "0", "trade_time": "1515662909"}, {"trade_id": "6659468", "order_id": "18139137", "type": "sell", "btc": "0.00312888", "price": "246877000", "fee": "0", "trade_time": "1515223710"}, {"trade_id": "6618092", "order_id": "18068655", "type": "buy", "btc": "0.00312888", "price": "247452000", "fee": "2322", "trade_time": "1515173250"}, {"trade_id": "6605576", "order_id": "18043263", "type": "sell", "btc": "0.00326840", "price": "237600000", "fee": "0", "trade_time": "1515157117"}, {"trade_id": "6568916", "order_id": "17981400", "type": "sell", "btc": "0.00127262", "price": "224998000", "fee": "0", "trade_time": "1515123128"}, {"trade_id": "6568915", "order_id": "17981400", "type": "sell", "btc": "0.00196919", "price": "224998000", "fee": "0", "trade_time": "1515123126"}, {"trade_id": "5310820", "order_id": "15652976", "type": "buy", "btc": "0.00351572", "price": "267900000", "fee": "2825", "trade_time": "1512662347"}, {"trade_id": "5310572", "order_id": "15652315", "type": "sell", "btc": "0.00354880", "price": "267000000", "fee": "2842", "trade_time": "1512662085"}, {"trade_id": "5309827", "order_id": "15650867", "type": "buy", "btc": "0.00354880", "price": "266999800", "fee": "0", "trade_time": "1512661610"}]}}'
+    assert exchange.get_order_fee(order=order) == 2322
+    req_mock.assert_called_once()
+    args, kwargs = req_mock.call_args
+    assert args[0] == VipExchangeAccount.BASE_URL
+    assert kwargs['data'] == OrderedDict([
+        ('nonce', str(int(datetime.now().timestamp()))),
+        ('method', 'tradeHistory'),
+        ('pair', VipExchangeAccount.PAIRS[BTCIDR]),
+        ('order_id', '18068655'),
+        ('count', 10)
+    ])
+
+def test_get_order_fee_fail(exchange, req_mock):
+    order = VipOrder(exchange, '18068655', BTCIDR, 'buy', 247452000, 1515173150, 0.00312888, finish_time=1515173250)
+    req_mock.return_value.content = '{"success": 0, "error": "some error"}'
+    with pytest.raises(ExchangeOperationFailedError) as excinfo:
+        exchange.get_order_fee(order=order)
+    assert str(excinfo.value) == 'some error'

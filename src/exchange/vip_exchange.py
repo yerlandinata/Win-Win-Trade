@@ -50,10 +50,6 @@ class VipExchangeAccount(ExchangeAccount):
             ('order_id', kwargs['order_id'])
         ])
         res = self.post_request(payload)
-        if res['success'] != 1:
-            if 'error' in res.keys():
-                raise ExchangeOperationFailedError(res['error'])
-            else: raise ExchangeOperationFailedError('Unknown error')
         remain_key = ''
         for key in res['return']['order'].keys():
             if 'order' in key and key != 'order_id':
@@ -62,6 +58,23 @@ class VipExchangeAccount(ExchangeAccount):
         return VipOrder(self, str(kwargs['order_id']), kwargs['currency_pair'], res['return']['order']['type'],
                         float(res['return']['order']['price']), int(res['return']['order']['submit_time']),
                         float(res['return']['order'][remain_key]), finish_time=int(res['return']['order']['finish_time']) if int(res['return']['order']['finish_time']) else None)
+
+    def get_order_fee(self, **kwargs):
+        '''
+        Arguments:
+        order
+        '''
+        payload = OrderedDict([
+            ('nonce', str(int(datetime.now().timestamp()))),
+            ('method', 'tradeHistory'),
+            ('pair', VipExchangeAccount.PAIRS[kwargs['order'].currency_pair]),
+            ('order_id', kwargs['order'].order_id),
+            ('count', 10)
+        ])
+        res = self.post_request(payload)
+        for trade in res['return']['trades']:
+            if kwargs['order'].order_id == trade['order_id']:
+                return int(trade['fee'])
 
     def place_buy_order(self, **kwargs):
         '''
@@ -107,4 +120,12 @@ class VipExchangeAccount(ExchangeAccount):
         }
         res = requests.post(self.BASE_URL, data=payload, headers=header)
         time.sleep(1) # so there is no extra effort to work the nonce when there are too many requests at same time
-        return json.loads(res.content)
+        response_json = json.loads(res.content)
+        self.__error_check(response_json)
+        return response_json
+
+    def __error_check(self, response):
+        if response['success'] != 1:
+            if 'error' in response.keys():
+                raise ExchangeOperationFailedError(response['error'])
+            else: raise ExchangeOperationFailedError('Unknown error')

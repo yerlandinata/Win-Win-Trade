@@ -6,6 +6,9 @@ class ExchangeAccount:
     def get_order(self, **kwargs):
         raise NotImplementedError()
 
+    def get_order_fee(self, **kwargs):
+        raise NotImplementedError()
+
     def cancel_order(self, **kwargs):
         raise NotImplementedError()
 
