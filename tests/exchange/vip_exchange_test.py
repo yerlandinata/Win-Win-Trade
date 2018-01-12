@@ -114,8 +114,8 @@ def test_place_buy_order(exchange, req_mock_place_order):
         ('method', 'trade'),
         ('pair', VipExchangeAccount.PAIRS[pair]),
         ('type', 'buy'),
-        ('price', str(price)),
-        ('btc', str(amount))
+        ('price', price),
+        ('idr', amount)
     ])
     assert req.call_args_list[0][0][0] == arg
     assert req.call_args_list[0][1]['data'] == data
@@ -148,8 +148,8 @@ def test_place_sell_order(exchange, req_mock_place_order):
         ('method', 'trade'),
         ('pair', VipExchangeAccount.PAIRS[pair]),
         ('type', 'sell'),
-        ('price', str(price)),
-        ('idr', str(amount))
+        ('price', price),
+        ('btc', amount)
     ])
     assert req.call_args_list[0][0][0] == arg
     assert req.call_args_list[0][1]['data'] == data

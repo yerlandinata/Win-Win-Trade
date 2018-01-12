@@ -69,7 +69,7 @@ class VipExchangeAccount(ExchangeAccount):
         '''
         if kwargs['currency_pair'] not in VipExchangeAccount.PAIRS:
             raise RuntimeError('Invalid currency pair: ' + kwargs['currency_pair'])
-        return self.__place_order(kwargs['currency_pair'], VipExchangeAccount.PAIRS[kwargs['currency_pair']].split('_')[0],
+        return self.__place_order(kwargs['currency_pair'], VipExchangeAccount.PAIRS[kwargs['currency_pair']].split('_')[1],
                                   'buy', kwargs['price'], kwargs['amount'])
 
     def place_sell_order(self, **kwargs):
@@ -79,7 +79,7 @@ class VipExchangeAccount(ExchangeAccount):
         '''
         if kwargs['currency_pair'] not in VipExchangeAccount.PAIRS:
             raise RuntimeError('Invalid currency pair: ' + kwargs['currency_pair'])
-        return self.__place_order(kwargs['currency_pair'], VipExchangeAccount.PAIRS[kwargs['currency_pair']].split('_')[1],
+        return self.__place_order(kwargs['currency_pair'], VipExchangeAccount.PAIRS[kwargs['currency_pair']].split('_')[0],
                                   'sell', kwargs['price'], kwargs['amount'])
 
     def __place_order(self, currency_pair, currency_ask, order_type, price, amount):
@@ -88,8 +88,8 @@ class VipExchangeAccount(ExchangeAccount):
             ('method', 'trade'),
             ('pair', VipExchangeAccount.PAIRS[currency_pair]),
             ('type', order_type),
-            ('price', str(price)),
-            (currency_ask, str(amount))
+            ('price', price),
+            (currency_ask, amount)
         ])
         res = self.post_request(payload)
         return self.get_order(order_id=res['return']['order_id'], currency_pair=currency_pair)
