@@ -9,5 +9,5 @@ class VipOrder(Order):
     def refresh(self):
         updated = self.exchange.get_order(order_id=self.order_id, currency_pair=self.currency_pair)
         self.finish_time = updated.finish_time
-        self.remaining_amount = updated.remaining_amount
+
         

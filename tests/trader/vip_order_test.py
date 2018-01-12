@@ -12,7 +12,6 @@ def test_refresh(exchange):
     order.refresh()
     exchange.get_order.assert_called_once_with(order_id='1', currency_pair='btc_idr')
     assert order.finish_time == 2
-    assert order.get_remaining() == 0
     assert order.is_fulfilled()
 
 def test_cancel_success(exchange):

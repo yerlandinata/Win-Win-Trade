@@ -56,7 +56,7 @@ class VipExchangeAccount(ExchangeAccount):
             else: raise ExchangeOperationFailedError('Unknown error')
         remain_key = ''
         for key in res['return']['order'].keys():
-            if 'remain' in key:
+            if 'order' in key and key != 'order_id':
                 remain_key = key
                 break
         return VipOrder(self, str(kwargs['order_id']), kwargs['currency_pair'], res['return']['order']['type'],

@@ -68,7 +68,7 @@ def test_get_order_with_id(exchange, req_mock):
     pair = XLMIDR
     order_id = '94425'
     req_mock.return_value.content = '{"success": 1,"return": {"order": {"order_id": "94425","price": "0.00810000","type": "sell","order_xlm": "1.00000000","remain_xlm": "0.53000000","submit_time": "1497657065","finish_time": "0","status": "open"}}}'
-    expected = VipOrder(exchange, order_id, pair, 'sell', 0.0081, 1497657065, 0.53)
+    expected = VipOrder(exchange, order_id, pair, 'sell', 0.0081, 1497657065, 1)
     actual_test = exchange.get_order(order_id=order_id, currency_pair=pair)
     assert actual_test == expected
     args, kwargs = req_mock.call_args
