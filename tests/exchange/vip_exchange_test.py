@@ -1,15 +1,15 @@
 from datetime import datetime
+import time
 from collections import OrderedDict
-from itertools import tee
 import requests
 import pytest
-from unittest.mock import call
 from src.valid_pairs import *
 from src.exchange import ExchangeOperationFailedError, VipExchangeAccount
 from src.trader import VipOrder
 
 @pytest.fixture()
-def exchange():
+def exchange(mocker, monkeypatch):
+    monkeypatch.setattr(time, 'sleep', mocker.Mock())
     return VipExchangeAccount('a', 'b')
 
 @pytest.fixture()

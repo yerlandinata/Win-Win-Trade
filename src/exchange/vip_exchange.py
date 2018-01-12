@@ -1,4 +1,5 @@
 from datetime import datetime
+import time
 import hmac
 import hashlib
 import json
@@ -105,4 +106,5 @@ class VipExchangeAccount(ExchangeAccount):
             'Sign': self.calculate_signature(payload)
         }
         res = requests.post(self.BASE_URL, data=payload, headers=header)
+        time.sleep(1) # so there is no extra effort to work the nonce when there are too many requests at same time
         return json.loads(res.content)
