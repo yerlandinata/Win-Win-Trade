@@ -9,10 +9,13 @@ class Market:
     def get_ohlc(self, currency, after, before=None, period='1'):
         raise NotImplementedError()
 
-    def get_buy_order_book(self):
+    def get_buy_order_book(self, currency):
         raise NotImplementedError()
 
-    def get_sell_order_book(self):
+    def get_sell_order_book(self, currency):
+        raise NotImplementedError()
+
+    def get_best_price(self, currency):
         raise NotImplementedError()
 
     def parse_ohlc_data(self, json_text):
