@@ -20,8 +20,8 @@ class Trader:
         self.fee_paid = 0
 
     def tick(self):
-        self.update_indicator()
         if self.state == Trader.BUY_WAIT or self.state == Trader.SELL_WAIT:
+            self.update_indicator()
             self.take_action()
         else: self.manage_orders()
 
@@ -42,14 +42,14 @@ class Trader:
         elif self.state == Trader.SELL_WAIT:
             if self.indicator.is_sell_signal():
                 price = self.market.get_best_price()
-                self.orders.append(self.exchange_account.place_sell_order(currency_pair=self.currency_pair, price=price, amount=self.investment))
+                self.orders.append(self.exchange_account.place_sell_order(currency_pair=self.currency_pair, price=price, amount=self.coin))
                 self.state = Trader.SELLING
 
     def manage_orders(self):
         current_order = self.orders[-1]
         if current_order.order_type == 'buy':
             if current_order.is_fulfilled():
-                self.coin = current_order.amount
+                self.coin = current_order.amount * current_order.price
                 self.fee_paid += self.exchange_account.get_order_fee(order=current_order)
                 self.state = Trader.SELL_WAIT
         elif current_order.order_type == 'sell':
@@ -58,4 +58,9 @@ class Trader:
                 self.investment = current_order.amount
                 self.fee_paid += self.exchange_account.get_order_fee(order=current_order)
                 self.state = Trader.BUY_WAIT
-            # TODO: Handle market crash
+            elif self.indicator.is_sell_signal():
+                current_order.cancel()
+                self.fee_paid += self.exchange_account.get_order_fee(order=current_order)
+                self.coin = self.exchange_account.get_balance(self.currency_pair[:3])
+                self.state = Trader.SELL_WAIT
+                self.take_action()

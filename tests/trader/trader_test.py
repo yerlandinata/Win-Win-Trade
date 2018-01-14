@@ -55,23 +55,26 @@ def test_take_action_buy_wait_no_buy_signal(exchange, market, indicator):
 
 def test_take_action_sell_wait_sell_signal(exchange, market, indicator):
     invest = 1
+    coin = 0.5
     trader = Trader(BTCIDR, exchange, market, indicator, invest)
     trader.state = Trader.SELL_WAIT
+    trader.coin = coin
     indicator.is_sell_signal.return_value = True
     price = 10
     market.get_best_price.return_value = price
-    order = Order(exchange, 1, BTCIDR, 'sell', price, 1, 1)
+    order = Order(exchange, 1, BTCIDR, 'sell', price, 1, coin)
     exchange.place_sell_order.return_value = order
     trader.take_action()
     indicator.is_sell_signal.assert_called_once()
     market.get_best_price.assert_called_once()
-    exchange.place_sell_order.assert_called_once_with(currency_pair=BTCIDR, price=price, amount=invest)
+    exchange.place_sell_order.assert_called_once_with(currency_pair=BTCIDR, price=price, amount=coin)
     assert trader.state == Trader.SELLING
     
 def test_manage_order_buy_success(mocker, exchange, market, indicator):
     order = mocker.Mock()
     order.is_fulfilled.return_value = True
     order.amount = 5
+    order.price = 20
     order.order_type = 'buy'
     exchange.get_order_fee.return_value = 100
     trader = Trader(BTCIDR, exchange, market, indicator, 1)
@@ -79,7 +82,7 @@ def test_manage_order_buy_success(mocker, exchange, market, indicator):
     trader.orders.append(order)
     trader.fee_paid = 50
     trader.manage_orders()
-    assert trader.coin == 5
+    assert trader.coin == 100
     assert trader.state == Trader.SELL_WAIT
     assert trader.fee_paid == 150
     exchange.get_order_fee.assert_called_once_with(order=order)
@@ -119,9 +122,40 @@ def test_manage_order_sell_not_complete(mocker, exchange, market, indicator):
     order.is_fulfilled.return_value = False
     order.amount = 5
     order.order_type = 'sell'
+    indicator.is_sell_signal.return_value = False
     trader = Trader(BTCIDR, exchange, market, indicator, 1)
     trader.state = Trader.SELLING
     trader.orders.append(order)
     trader.manage_orders()
     assert trader.state == Trader.SELLING
     exchange.get_order_fee.assert_not_called()
+
+def test_manage_order_handle_market_crashing(mocker, exchange, market, indicator):
+    order = mocker.Mock()
+    order.is_fulfilled.return_value = False
+    order.amount = 5
+    order.order_type = 'sell'
+    indicator.is_sell_signal.return_value = True
+    price = 10
+    market.get_best_price.return_value = price
+    remaining_coin = 4
+    order_new = Order(exchange, 5, BTCIDR, 'sell', price, 12, remaining_coin)
+    exchange.get_balance.return_value = remaining_coin
+    exchange.place_sell_order.return_value = order_new
+    exchange.get_order_fee.return_value = 20
+    trader = Trader(BTCIDR, exchange, market, indicator, 1)
+    trader.state = Trader.SELLING
+    trader.orders.append(order)
+    trader.coin = 5
+    trader.fee_paid = 5
+    trader.manage_orders()
+    order.cancel.assert_called_once()
+    indicator.is_sell_signal.assert_called()
+    market.get_best_price.assert_called_once()
+    exchange.get_balance.assert_called_once_with('btc')
+    exchange.get_order_fee.assert_called_once_with(order=order)
+    exchange.place_sell_order.assert_called_once_with(currency_pair=BTCIDR, price=price, amount=remaining_coin)
+    assert trader.state == Trader.SELLING
+    assert trader.coin == remaining_coin
+    assert trader.orders[-1] == order_new
+    assert trader.fee_paid == 25
