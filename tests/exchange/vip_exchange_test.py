@@ -185,3 +185,25 @@ def test_get_order_fee_fail(exchange, req_mock):
     with pytest.raises(ExchangeOperationFailedError) as excinfo:
         exchange.get_order_fee(order=order)
     assert str(excinfo.value) == 'some error'
+
+def test_cancel_order(exchange, req_mock):
+    order = VipOrder(exchange, '18068655', BTCIDR, 'buy', 247452000, 1515173150, 0.00312888)
+    req_mock.return_value.content = '{"success": 1, "return": {"order_id": "18068655"}}'
+    exchange.cancel_order(order=order)
+    req_mock.assert_called_once()
+    args, kwargs = req_mock.call_args
+    assert args[0] == VipExchangeAccount.BASE_URL
+    assert kwargs['data'] == OrderedDict([
+        ('nonce', str(int(datetime.now().timestamp()))),
+        ('method', 'cancelOrder'),
+        ('pair', VipExchangeAccount.PAIRS[BTCIDR]),
+        ('order_id', '18068655'),
+        ('type', 'buy')
+    ])
+
+def test_cancel_order_fail(exchange, req_mock):
+    order = VipOrder(exchange, '18068655', BTCIDR, 'buy', 247452000, 1515173150, 0.00312888)
+    req_mock.return_value.content = '{"success": 0, "error": "some error"}'
+    with pytest.raises(ExchangeOperationFailedError) as excinfo:
+        exchange.cancel_order(order=order)
+    assert str(excinfo.value) == 'some error'

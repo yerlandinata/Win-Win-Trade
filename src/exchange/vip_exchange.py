@@ -76,6 +76,20 @@ class VipExchangeAccount(ExchangeAccount):
             if kwargs['order'].order_id == trade['order_id']:
                 return int(trade['fee'])
 
+    def cancel_order(self, **kwargs):
+        '''
+        Arguments:
+        order
+        '''
+        payload = OrderedDict([
+            ('nonce', str(int(datetime.now().timestamp()))),
+            ('method', 'cancelOrder'),
+            ('pair', VipExchangeAccount.PAIRS[kwargs['order'].currency_pair]),
+            ('order_id', kwargs['order'].order_id),
+            ('type', 'buy')
+        ])
+        self.post_request(payload)
+
     def place_buy_order(self, **kwargs):
         '''
         Arguments:
