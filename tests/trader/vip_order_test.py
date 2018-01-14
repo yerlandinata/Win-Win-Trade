@@ -18,7 +18,7 @@ def test_cancel_success(exchange):
     order = VipOrder(exchange, '1', 'btc_idr', 'buy', 1, 1, 2)
     order.cancel()
     assert order.is_canceled
-    exchange.cancel_order.assert_called_once_with(order_id='1', currency_pair='btc_idr', order_type='buy')
+    exchange.cancel_order.assert_called_once_with(order=order)
 
 def test_cancel_failed(exchange):
     order = VipOrder(exchange, '1', 'btc_idr', 'buy', 1, 1, 2)
