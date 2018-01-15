@@ -13,7 +13,7 @@ class EMACrossoverIndicator(Indicator):
         self.confirm_period = confirm_period
 
     def is_sell_signal(self, *args, **kwargs):
-        return self.__ema_cross().tail(1)[0] < 0
+        return self.__ema_cross().tail(1)[self.__ema_cross().tail(1).index[0]] < 0
 
     def is_buy_signal(self, *args, **kwargs):
         count = 0
