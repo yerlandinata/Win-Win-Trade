@@ -73,8 +73,6 @@ class BitcoinIndonesiaMarket(Market):
     def get_best_price(self, currency):
         depth_buy = self.get_buy_order_book(currency)
         depth_sell = self.get_sell_order_book(currency)
-        print(depth_buy.tail(1))
-        print(depth_sell.head(1))
         return (depth_buy.tail(1).index[0] + depth_sell.head(1).index[0]) // 2
 
     def __depth_currency_check(self, currency):
