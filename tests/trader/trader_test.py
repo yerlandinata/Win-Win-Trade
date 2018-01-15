@@ -39,7 +39,7 @@ def test_take_action_buy_wait_buy_signal(exchange, market, indicator):
     exchange.place_buy_order.return_value = order
     trader.take_action()
     indicator.is_buy_signal.assert_called_once()
-    market.get_best_price.assert_called_once()
+    market.get_best_price.assert_called_once_with(BTCIDR)
     exchange.place_buy_order.assert_called_once_with(currency_pair=BTCIDR, price=price, amount=invest)
     assert trader.state == Trader.BUYING
   
@@ -66,7 +66,7 @@ def test_take_action_sell_wait_sell_signal(exchange, market, indicator):
     exchange.place_sell_order.return_value = order
     trader.take_action()
     indicator.is_sell_signal.assert_called_once()
-    market.get_best_price.assert_called_once()
+    market.get_best_price.assert_called_once_with(BTCIDR)
     exchange.place_sell_order.assert_called_once_with(currency_pair=BTCIDR, price=price, amount=coin)
     assert trader.state == Trader.SELLING
     
@@ -151,7 +151,7 @@ def test_manage_order_handle_market_crashing(mocker, exchange, market, indicator
     trader.manage_orders()
     order.cancel.assert_called_once()
     indicator.is_sell_signal.assert_called()
-    market.get_best_price.assert_called_once()
+    market.get_best_price.assert_called_once_with(BTCIDR)
     exchange.get_balance.assert_called_once_with('btc')
     exchange.get_order_fee.assert_called_once_with(order=order)
     exchange.place_sell_order.assert_called_once_with(currency_pair=BTCIDR, price=price, amount=remaining_coin)

@@ -38,13 +38,13 @@ class Trader:
     def take_action(self):
         if self.state == Trader.BUY_WAIT:
             if self.indicator.is_buy_signal():
-                price = self.market.get_best_price()
+                price = self.market.get_best_price(self.currency_pair)
                 self.orders.append(self.exchange_account.place_buy_order(currency_pair=self.currency_pair, price=price, amount=self.investment))
                 logger.log_order_issue(self.orders[-1])
                 self.state = Trader.BUYING
         elif self.state == Trader.SELL_WAIT:
             if self.indicator.is_sell_signal():
-                price = self.market.get_best_price()
+                price = self.market.get_best_price(self.currency_pair)
                 self.orders.append(self.exchange_account.place_sell_order(currency_pair=self.currency_pair, price=price, amount=self.coin))
                 logger.log_order_issue(self.orders[-1])
                 self.state = Trader.SELLING
