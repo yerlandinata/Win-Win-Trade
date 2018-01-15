@@ -54,14 +54,14 @@ class Trader:
         if current_order.order_type == 'buy':
             if current_order.is_fulfilled():
                 logger.log_order_fulfilled(current_order)
-                self.coin = current_order.amount * current_order.price
+                self.coin = float(str(current_order.amount / current_order.price)[:10])
                 self.fee_paid += self.exchange_account.get_order_fee(order=current_order)
                 self.state = Trader.SELL_WAIT
         elif current_order.order_type == 'sell':
             if current_order.is_fulfilled():
                 logger.log_order_fulfilled(current_order)
                 self.coin = 0
-                self.investment = current_order.amount
+                self.investment = int(current_order.amount * current_order.price)
                 self.fee_paid += self.exchange_account.get_order_fee(order=current_order)
                 self.state = Trader.BUY_WAIT
             elif self.indicator.is_sell_signal():

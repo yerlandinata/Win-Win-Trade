@@ -73,8 +73,8 @@ def test_take_action_sell_wait_sell_signal(exchange, market, indicator):
 def test_manage_order_buy_success(mocker, exchange, market, indicator):
     order = mocker.Mock()
     order.is_fulfilled.return_value = True
-    order.amount = 5
-    order.price = 20
+    order.amount = 75000
+    order.price =  203779000
     order.order_type = 'buy'
     exchange.get_order_fee.return_value = 100
     trader = Trader(BTCIDR, exchange, market, indicator, 1)
@@ -82,7 +82,7 @@ def test_manage_order_buy_success(mocker, exchange, market, indicator):
     trader.orders.append(order)
     trader.fee_paid = 50
     trader.manage_orders()
-    assert trader.coin == 100
+    assert trader.coin == 0.00036804
     assert trader.state == Trader.SELL_WAIT
     assert trader.fee_paid == 150
     exchange.get_order_fee.assert_called_once_with(order=order)
@@ -103,7 +103,8 @@ def test_manage_order_buy_not_complete(mocker, exchange, market, indicator):
 def test_manage_order_sell_success(mocker, exchange, market, indicator):
     order = mocker.Mock()
     order.is_fulfilled.return_value = True
-    order.amount = 100000
+    order.amount = 0.00036886
+    order.price = 203398000
     order.order_type = 'sell'
     exchange.get_order_fee.return_value = 200
     trader = Trader(BTCIDR, exchange, market, indicator, 50000)
@@ -112,7 +113,7 @@ def test_manage_order_sell_success(mocker, exchange, market, indicator):
     trader.fee_paid = 50
     trader.manage_orders()
     assert trader.coin == 0
-    assert trader.investment == 100000
+    assert trader.investment == 75025
     assert trader.state == Trader.BUY_WAIT
     assert trader.fee_paid == 250
     exchange.get_order_fee.assert_called_once_with(order=order)
