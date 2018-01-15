@@ -18,7 +18,7 @@ def initialize():
     exchange_account = VipExchangeAccount(vip_api_key, vip_api_secret)
     market = BitcoinIndonesiaMarket()
     ema_crossorver_35_50_10 = EMACrossoverIndicator(market.get_ohlc(
-        vip_trades_symbol, int((datetime.now() - timedelta(minutes=15*60)).timestamp()), period=15
+        vip_trades_symbol, int((datetime.now() - timedelta(minutes=15*180)).timestamp()), period=15
     ), 35, 50, confirm_period=10)
     trader = Trader(vip_trades_symbol, exchange_account, market, ema_crossorver_35_50_10, 
                     initial_investment, price_period=15)
