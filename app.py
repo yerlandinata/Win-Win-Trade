@@ -28,7 +28,10 @@ def begin_tick(trader):
     while True:
         try:
             trader.tick()
-            time.sleep(15*60)
+            sleep_time = 60
+            if trader.state == Trader.BUY_WAIT or trader.state == Trader.SELL_WAIT:
+                sleep_time = 15 * 60
+            time.sleep(sleep_time)
         except Exception as ex:
             end_tick(ex)
 
