@@ -21,9 +21,9 @@ class Trader:
         self.fee_paid = 0
 
     def tick(self):
+        self.update_indicator()
         if self.state == Trader.BUY_WAIT or self.state == Trader.SELL_WAIT:
             logger.log_investment(self.currency_pair[3:].upper(), self.investment)
-            self.update_indicator()
             self.take_action()
         else: self.manage_orders()
 
