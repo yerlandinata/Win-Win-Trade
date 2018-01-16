@@ -34,6 +34,7 @@ class Trader:
         i = recent_price.index[0]
         self.indicator.update(recent_price.index[0], recent_price.open[i], recent_price.high[i],
                             recent_price.low[i], recent_price.close[i], recent_price.volume[i])
+        logger.log_indicator_signal(self.indicator.is_buy_signal(), self.indicator.is_sell_signal())
 
     def take_action(self):
         if self.state == Trader.BUY_WAIT:
