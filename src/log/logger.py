@@ -10,18 +10,8 @@ def log_indicator_signal(is_buy, is_sell):
     elif is_sell:
         print('[{}] sell signal detected'.format(time()))
 
-def log_order_issuing(order):
-    print('[{}] issuing {} order, id: {}, currency pair: {}, amount: {}, price: {}'
-          .format(time(), order.order_type, order.order_id,
-                  order.currency_pair, order.amount, order.price))
-
 def log_order_issue(order):
     print('[{}] {} order issued, id: {}, currency pair: {}, amount: {}, price: {}'
-          .format(time(), order.order_type, order.order_id,
-                  order.currency_pair, order.amount, order.price))
-
-def log_order_canceling(order):
-    print('[{}] canceling {} order, id: {}, currency pair: {}, amount: {}, price: {}'
           .format(time(), order.order_type, order.order_id,
                   order.currency_pair, order.amount, order.price))
 
