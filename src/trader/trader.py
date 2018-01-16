@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from src.log import logger
+from src.exchange import ExchangeOperationFailedError
 
 class Trader:
 
@@ -66,7 +67,13 @@ class Trader:
                 self.fee_paid += self.exchange_account.get_order_fee(order=current_order)
                 self.state = Trader.BUY_WAIT
             elif self.indicator.is_sell_signal():
-                current_order.cancel()
+                try:
+                    current_order.cancel()
+                except ExchangeOperationFailedError as ex:
+                    if str(ex) == 'invalid order. ':
+                        self.manage_orders()
+                        return
+                    else: raise ex
                 logger.log_order_canceled(current_order)
                 self.fee_paid += self.exchange_account.get_order_fee(order=current_order)
                 self.coin = self.exchange_account.get_balance(self.currency_pair[:3])

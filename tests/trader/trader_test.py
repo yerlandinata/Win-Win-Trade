@@ -3,6 +3,7 @@ import pytest
 from pandas import DataFrame
 from src.valid_pairs import *
 from src.trader import Trader, Order
+from src.exchange import ExchangeOperationFailedError
 
 @pytest.fixture()
 def exchange(mocker):
@@ -160,3 +161,42 @@ def test_manage_order_handle_market_crashing(mocker, exchange, market, indicator
     assert trader.coin == remaining_coin
     assert trader.orders[-1] == order_new
     assert trader.fee_paid == 25
+
+def test_manage_order_cancel_fulfilled(mocker, exchange, market, indicator):
+    order = mocker.Mock()
+    order.is_fulfilled.side_effect = [False, True]
+    order.amount = 0.00036886
+    order.price = 203398000
+    order.order_type = 'sell'
+    order.cancel.side_effect = ExchangeOperationFailedError('invalid order. ')
+    exchange.get_order_fee.return_value = 200
+    trader = Trader(BTCIDR, exchange, market, indicator, 75000)
+    trader.state = Trader.SELLING
+    trader.orders.append(order)
+    trader.coin = 5
+    trader.fee_paid = 50
+    trader.manage_orders()
+    exchange.place_sell_order.assert_not_called()
+    assert trader.coin == 0
+    assert trader.investment == 75025
+    assert trader.state == Trader.BUY_WAIT
+    assert trader.fee_paid == 250
+    exchange.get_order_fee.assert_called_once_with(order=order)
+
+
+def test_manage_order_cancel_fail(mocker, exchange, market, indicator):
+    order = mocker.Mock()
+    order.is_fulfilled.side_effect = [False, True]
+    order.amount = 0.00036886
+    order.price = 203398000
+    order.order_type = 'sell'
+    order.cancel.side_effect = ExchangeOperationFailedError('Unknown error')
+    exchange.get_order_fee.return_value = 200
+    trader = Trader(BTCIDR, exchange, market, indicator, 75000)
+    trader.state = Trader.SELLING
+    trader.orders.append(order)
+    trader.coin = 5
+    trader.fee_paid = 50
+    with pytest.raises(ExchangeOperationFailedError) as exc:
+        trader.manage_orders()
+    assert 'Unknown' in str(exc.value)
